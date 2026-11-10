@@ -1,6 +1,8 @@
-import { moduloRegistros } from "../services/graficasRegistros";
+import { usePeticion } from "../../core/hooks/usePeticion";
+import { obtenerRegistros, obtenerConsultaRegistros, obtenerDatosRegistros } from "../services/registrosApi";
 
-/** Datos de la sección Registros (gráficas generadas por el backend). */
+/** Carga la sección Registros desde la API y expone cómo pedir sus consultas y datos. */
 export function useRegistros() {
-  return moduloRegistros;
+  const detalle = usePeticion(obtenerRegistros, []);
+  return { detalle, cargarConsulta: obtenerConsultaRegistros, cargarDatos: obtenerDatosRegistros };
 }

@@ -1,6 +1,8 @@
-import { moduloPrioridades } from "../services/graficasPrioridades";
+import { usePeticion } from "../../core/hooks/usePeticion";
+import { obtenerPrioridades, obtenerConsultaPrioridades, obtenerDatosPrioridades } from "../services/prioridadesApi";
 
-/** Datos de la sección Prioridades (gráficas generadas por el backend). */
+/** Carga la sección Prioridades desde la API y expone cómo pedir sus consultas y datos. */
 export function usePrioridades() {
-  return moduloPrioridades;
+  const detalle = usePeticion(obtenerPrioridades, []);
+  return { detalle, cargarConsulta: obtenerConsultaPrioridades, cargarDatos: obtenerDatosPrioridades };
 }

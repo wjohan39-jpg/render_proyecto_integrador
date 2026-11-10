@@ -1,18 +1,17 @@
 import type { Grafica } from "../lib/tipos";
-import { rutaReporte } from "../lib/rutasReportes";
+import { urlApi } from "../lib/api";
 import { conCeros } from "../utils/formato";
 
 interface Props {
   grafica: Grafica;
-  numero: number;
 }
 
-export default function TarjetaGrafica({ grafica, numero }: Props) {
-  const ruta = rutaReporte(grafica.archivo);
+export default function TarjetaGrafica({ grafica }: Props) {
+  const ruta = urlApi(grafica.url);
   return (
     <article className="grafica">
       <header className="grafica__encabezado">
-        <span className="grafica__numero">{conCeros(numero)}</span>
+        <span className="grafica__numero">{conCeros(grafica.numero)}</span>
         <div>
           <h2>{grafica.titulo}</h2>
           <p>{grafica.descripcion}</p>
@@ -25,7 +24,7 @@ export default function TarjetaGrafica({ grafica, numero }: Props) {
         rel="noreferrer"
         aria-label={`Abrir gráfica: ${grafica.titulo}`}
       >
-        <img src={ruta} alt={grafica.alt} />
+        <img src={ruta} alt={grafica.alt} loading="lazy" />
       </a>
     </article>
   );

@@ -1,43 +1,43 @@
-import type { ComponentType } from "react";
+import { useMemo, type ComponentType } from "react";
 import BarraSuperior from "./modules/core/components/BarraSuperior";
 import NavegacionModulos from "./modules/core/components/NavegacionModulos";
 import PiePagina from "./modules/core/components/PiePagina";
+import EstadoCarga from "./modules/core/design-system/EstadoCarga";
 import { useModuloActivo } from "./modules/core/hooks/useModuloActivo";
+import { usePeticion } from "./modules/core/hooks/usePeticion";
+import { API_URL, obtenerModulos } from "./modules/core/lib/api";
 import PrioridadesReporte from "./modules/prioridades/components/PrioridadesReporte";
-import { moduloPrioridades } from "./modules/prioridades/services/graficasPrioridades";
 import RegistrosReporte from "./modules/registros/components/RegistrosReporte";
-import { moduloRegistros } from "./modules/registros/services/graficasRegistros";
 import EmpresasReporte from "./modules/empresas/components/EmpresasReporte";
-import { moduloEmpresas } from "./modules/empresas/services/graficasEmpresas";
 import RetosReporte from "./modules/retos/components/RetosReporte";
-import { moduloRetos } from "./modules/retos/services/graficasRetos";
 
-interface Seccion {
-  id: string;
-  nombre: string;
-  autor: string;
-  Componente: ComponentType;
-}
-
-const SECCIONES: Seccion[] = [
-  { id: moduloPrioridades.id, nombre: moduloPrioridades.nombre, autor: moduloPrioridades.autor, Componente: PrioridadesReporte },
-  { id: moduloRegistros.id, nombre: moduloRegistros.nombre, autor: moduloRegistros.autor, Componente: RegistrosReporte },
-  { id: moduloEmpresas.id, nombre: moduloEmpresas.nombre, autor: moduloEmpresas.autor, Componente: EmpresasReporte },
-  { id: moduloRetos.id, nombre: moduloRetos.nombre, autor: moduloRetos.autor, Componente: RetosReporte },
-];
-const IDS = SECCIONES.map((seccion) => seccion.id);
+/** Componente de React que pinta cada sección que entrega la API. */
+const COMPONENTES: Record<string, ComponentType> = {
+  prioridades: PrioridadesReporte,
+  registros: RegistrosReporte,
+  empresas: EmpresasReporte,
+  retos: RetosReporte,
+};
 
 export default function App() {
-  const activo = useModuloActivo(IDS);
-  const seccion = SECCIONES.find((s) => s.id === activo) ?? SECCIONES[0];
-  const { Componente } = seccion;
+  const { datos, cargando, error } = usePeticion(obtenerModulos, []);
+  const modulos = useMemo(() => (datos ?? []).filter((m) => m.id in COMPONENTES), [datos]);
+  const ids = useMemo(() => modulos.map((m) => m.id), [modulos]);
+  const activo = useModuloActivo(ids);
+  const seccion = modulos.find((m) => m.id === activo);
+  const Componente = seccion ? COMPONENTES[seccion.id] : null;
 
   return (
     <main className="pagina">
       <BarraSuperior />
-      <NavegacionModulos opciones={SECCIONES} activo={seccion.id} />
-      <Componente />
-      <PiePagina nombre={seccion.nombre} autor={seccion.autor} />
+      {modulos.length > 0 && <NavegacionModulos opciones={modulos} activo={activo ?? ""} />}
+      <EstadoCarga
+        cargando={cargando}
+        error={error && `${error} (API: ${API_URL})`}
+        textoCarga="Conectando con la API… (en Render el primer arranque puede tardar hasta un minuto)"
+      />
+      {Componente && seccion && <Componente key={seccion.id} />}
+      {seccion && <PiePagina nombre={seccion.nombre} autor={seccion.autor} />}
     </main>
   );
 }

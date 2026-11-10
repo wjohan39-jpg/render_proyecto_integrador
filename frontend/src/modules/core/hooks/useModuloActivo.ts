@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
 
-/** Devuelve el id del modulo indicado en la URL (#empresas); si no hay, el primero. */
-export function useModuloActivo(ids: readonly string[]): string {
-  const leer = () => {
-    const hash = window.location.hash.slice(1);
-    return ids.includes(hash) ? hash : ids[0];
-  };
-  const [activo, setActivo] = useState(leer);
+/** Devuelve el id del módulo indicado en la URL (#empresas); si no es válido, el primero. */
+export function useModuloActivo(ids: readonly string[]): string | undefined {
+  const [hash, setHash] = useState(() => window.location.hash.slice(1));
 
   useEffect(() => {
-    const alCambiar = () => setActivo(leer());
+    const alCambiar = () => setHash(window.location.hash.slice(1));
     window.addEventListener("hashchange", alCambiar);
     return () => window.removeEventListener("hashchange", alCambiar);
-  }, [ids]);
+  }, []);
 
-  return activo;
+  return ids.includes(hash) ? hash : ids[0];
 }

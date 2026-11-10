@@ -9,7 +9,7 @@ export default function PiePagina({ nombre, autor }: Props) {
       <span>
         Proyecto integrador · {nombre} · {autor}
       </span>
-      <span>Imágenes generadas por el reporte local</span>
+      <span>Datos servidos por la API del proyecto</span>
     </footer>
   );
 }

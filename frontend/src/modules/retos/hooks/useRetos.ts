@@ -1,6 +1,8 @@
-import { moduloRetos } from "../services/graficasRetos";
+import { usePeticion } from "../../core/hooks/usePeticion";
+import { obtenerRetos, obtenerConsultaRetos, obtenerDatosRetos } from "../services/retosApi";
 
-/** Datos de la sección Retos (gráficas generadas por el backend). */
+/** Carga la sección Retos desde la API y expone cómo pedir sus consultas y datos. */
 export function useRetos() {
-  return moduloRetos;
+  const detalle = usePeticion(obtenerRetos, []);
+  return { detalle, cargarConsulta: obtenerConsultaRetos, cargarDatos: obtenerDatosRetos };
 }

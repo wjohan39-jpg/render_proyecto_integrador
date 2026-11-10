@@ -7,7 +7,6 @@ const frontendDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
-  publicDir: path.resolve(frontendDirectory, "../reportes"),
   server: {
     host: "127.0.0.1",
   },

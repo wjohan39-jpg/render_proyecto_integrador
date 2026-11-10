@@ -249,6 +249,136 @@ h1 span {
   outline-offset: 3px;
 }
 
+.panel {
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.panel__encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.panel__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.panel__subtitulo {
+  margin: 10px 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.panel__pagina,
+.panel__nota {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.panel__nota {
+  margin: 10px 0 0;
+}
+
+.boton {
+  min-width: 34px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton:hover:not(:disabled) {
+  border-color: var(--green);
+}
+
+.boton--activo {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+
+.boton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.boton:focus-visible,
+.tabla:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 2px;
+}
+
+.tabla {
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid var(--line);
+}
+
+.tabla table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.tabla th,
+.tabla td {
+  max-width: 260px;
+  overflow: hidden;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tabla th {
+  position: sticky;
+  top: 0;
+  background: #e7eee8;
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.tabla tbody tr:nth-child(even) {
+  background: #fafbf7;
+}
+
+.estado-carga {
+  margin: 24px 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.estado-carga--error {
+  border: 1px solid var(--orange);
+  background: #fdf1ec;
+  color: #8a3417;
+}
+
 .pie-pagina {
   display: flex;
   justify-content: space-between;

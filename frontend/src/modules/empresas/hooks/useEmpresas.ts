@@ -1,6 +1,8 @@
-import { moduloEmpresas } from "../services/graficasEmpresas";
+import { usePeticion } from "../../core/hooks/usePeticion";
+import { obtenerEmpresas, obtenerConsultaEmpresas, obtenerDatosEmpresas } from "../services/empresasApi";
 
-/** Datos de la sección Empresas (gráficas generadas por el backend). */
+/** Carga la sección Empresas desde la API y expone cómo pedir sus consultas y datos. */
 export function useEmpresas() {
-  return moduloEmpresas;
+  const detalle = usePeticion(obtenerEmpresas, []);
+  return { detalle, cargarConsulta: obtenerConsultaEmpresas, cargarDatos: obtenerDatosEmpresas };
 }

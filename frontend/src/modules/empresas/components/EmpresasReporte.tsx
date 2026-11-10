@@ -2,6 +2,6 @@ import SeccionReporte from "../../core/components/SeccionReporte";
 import { useEmpresas } from "../hooks/useEmpresas";
 
 export default function EmpresasReporte() {
-  const modulo = useEmpresas();
-  return <SeccionReporte modulo={modulo} />;
+  const { detalle, cargarConsulta, cargarDatos } = useEmpresas();
+  return <SeccionReporte detalle={detalle} cargarConsulta={cargarConsulta} cargarDatos={cargarDatos} />;
 }

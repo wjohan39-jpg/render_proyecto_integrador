@@ -7,7 +7,7 @@ export default function BarraSuperior() {
       </a>
       <span className="estado">
         <span className="estado__punto" />
-        Reportes locales
+        Conectado a la API
       </span>
     </header>
   );
