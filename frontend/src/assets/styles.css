@@ -30,8 +30,6 @@ body {
   /* Franja con los colores de la marca Cesde */
   border-top: 5px solid;
   border-image: linear-gradient(90deg, var(--primario), var(--morado) 55%, var(--acento)) 1;
-  background-image: linear-gradient(rgba(21, 21, 27, 0.025) 1px, transparent 1px);
-  background-size: 100% 32px;
 }
 
 a {
@@ -39,8 +37,100 @@ a {
 }
 
 .pagina {
+  position: relative;
+  z-index: 1;
   width: min(1240px, calc(100% - 64px));
   margin: 0 auto;
+}
+
+/* ---------- Fondo animado (aurora + rejilla + red de datos) ---------- */
+.fondo {
+  position: fixed;
+  inset: 5px 0 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fondo__aurora span {
+  position: absolute;
+  width: 46vmax;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.2;
+  animation: flotar 14s ease-in-out infinite alternate;
+}
+
+.fondo__aurora span:nth-child(1) {
+  top: -18vmax;
+  left: -12vmax;
+  background: var(--primario);
+}
+
+.fondo__aurora span:nth-child(2) {
+  top: 8vmax;
+  right: -16vmax;
+  background: var(--morado);
+  animation-duration: 17s;
+  animation-delay: -5s;
+}
+
+.fondo__aurora span:nth-child(3) {
+  bottom: -22vmax;
+  left: 28vw;
+  background: var(--acento);
+  opacity: 0.13;
+  animation-duration: 20s;
+  animation-delay: -9s;
+}
+
+.fondo__rejilla {
+  position: absolute;
+  right: -50%;
+  bottom: -6%;
+  left: -50%;
+  height: 52vh;
+  background-image:
+    linear-gradient(rgba(101, 45, 144, 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(101, 45, 144, 0.13) 1px, transparent 1px);
+  background-size: 56px 56px;
+  transform: perspective(520px) rotateX(64deg);
+  transform-origin: bottom center;
+  mask-image: linear-gradient(to top, #000 15%, transparent 90%);
+  animation: avanzar 3s linear infinite;
+}
+
+.fondo__red {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes flotar {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(14vw, 10vh) scale(1.18);
+  }
+  100% {
+    transform: translate(-10vw, 16vh) scale(0.9);
+  }
+}
+
+@keyframes avanzar {
+  to {
+    background-position: 0 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fondo__aurora span,
+  .fondo__rejilla {
+    animation: none;
+  }
 }
 
 .barra-superior {
@@ -120,7 +210,8 @@ a {
 
 .pestana--activa {
   border-bottom-color: var(--primario);
-  background: var(--paper);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(14px);
 }
 
 .pestana__titulo {
@@ -197,11 +288,17 @@ h1 span {
   padding: 24px 0 42px;
 }
 
+.grafica,
+.panel {
+  border: 1px solid rgba(230, 227, 232, 0.9);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 10px 30px -18px rgba(101, 45, 144, 0.35);
+  backdrop-filter: blur(14px);
+}
+
 .grafica {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--line);
-  background: var(--paper);
 }
 
 .grafica:first-child {
@@ -263,8 +360,6 @@ h1 span {
 .panel {
   margin-bottom: 24px;
   padding: 18px 20px;
-  border: 1px solid var(--line);
-  background: var(--paper);
 }
 
 .panel__encabezado {

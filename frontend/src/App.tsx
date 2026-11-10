@@ -1,5 +1,6 @@
 import { useMemo, type ComponentType } from "react";
 import BarraSuperior from "./modules/core/components/BarraSuperior";
+import FondoAnimado from "./modules/core/components/FondoAnimado";
 import NavegacionModulos from "./modules/core/components/NavegacionModulos";
 import PiePagina from "./modules/core/components/PiePagina";
 import EstadoCarga from "./modules/core/design-system/EstadoCarga";
@@ -28,16 +29,19 @@ export default function App() {
   const Componente = seccion ? COMPONENTES[seccion.id] : null;
 
   return (
-    <main className="pagina">
-      <BarraSuperior />
-      {modulos.length > 0 && <NavegacionModulos opciones={modulos} activo={activo ?? ""} />}
-      <EstadoCarga
-        cargando={cargando}
-        error={error && `${error} (API: ${API_URL})`}
-        textoCarga="Conectando con la API… (en Render el primer arranque puede tardar hasta un minuto)"
-      />
-      {Componente && seccion && <Componente key={seccion.id} />}
-      {seccion && <PiePagina nombre={seccion.nombre} autor={seccion.autor} />}
-    </main>
+    <>
+      <FondoAnimado />
+      <main className="pagina">
+        <BarraSuperior />
+        {modulos.length > 0 && <NavegacionModulos opciones={modulos} activo={activo ?? ""} />}
+        <EstadoCarga
+          cargando={cargando}
+          error={error && `${error} (API: ${API_URL})`}
+          textoCarga="Conectando con la API… (en Render el primer arranque puede tardar hasta un minuto)"
+        />
+        {Componente && seccion && <Componente key={seccion.id} />}
+        {seccion && <PiePagina nombre={seccion.nombre} autor={seccion.autor} />}
+      </main>
+    </>
   );
 }
