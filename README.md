@@ -25,7 +25,7 @@ El proyecto tiene tres partes:
 
 La API usa el plan gratuito: si pasa ~15 minutos sin recibir visitas se apaga, y la primera petición siguiente puede tardar hasta un minuto.
 
-Cada `git push` a `main` vuelve a desplegar ambos servicios automáticamente.
+Los servicios se crearon a partir de la URL pública del repositorio, así que Render **no** despliega solo con cada `git push`. Ver [Publicar cambios](#publicar-cambios).
 
 ## Estructura
 
@@ -141,6 +141,10 @@ La variable de entorno `CORS_ORIGINS` (orígenes separados por comas) limita qu�
    git commit -m "Describe el cambio"
    git push
    ```
+
+3. Despliega en Render: en el [panel de Render](https://dashboard.render.com), abre `proyecto-integrador-api` y `proyecto-integrador` y pulsa **Manual Deploy → Deploy latest commit** en cada uno.
+
+Para que cada `git push` despliegue solo, conecta la cuenta de GitHub en Render (*Account Settings → Git providers*) y vincula el repositorio a los dos servicios.
 
 Render no ejecuta `main.py`: publica los CSV y PNG que estén en el repositorio.
 
