@@ -1,18 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap");
 
 :root {
-  font-family: "Manrope", "Avenir Next", sans-serif;
-  color: #172321;
-  background: #f3f5ef;
+  font-family: "General Sans", "Avenir Next", system-ui, sans-serif;
+  color: #15151b;
+  background: #f7f6f8;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --ink: #172321;
-  --muted: #64736e;
-  --line: #d7ded6;
-  --paper: #fffefa;
-  --green: #0e6b54;
-  --orange: #e1744d;
+  --ink: #15151b;
+  --muted: #5a635d;
+  --line: #e6e3e8;
+  --paper: #ffffff;
+  --primario: #db2771;
+  --morado: #652d90;
+  --tinte: #fce8f1;
+  --acento: #ff5d31;
   --mono: "DM Mono", "SFMono-Regular", monospace;
 }
 
@@ -24,7 +27,10 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background-image: linear-gradient(rgba(23, 35, 33, 0.025) 1px, transparent 1px);
+  /* Franja con los colores de la marca Cesde */
+  border-top: 5px solid;
+  border-image: linear-gradient(90deg, var(--primario), var(--morado) 55%, var(--acento)) 1;
+  background-image: linear-gradient(rgba(21, 21, 27, 0.025) 1px, transparent 1px);
   background-size: 100% 32px;
 }
 
@@ -49,23 +55,28 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 11px;
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-decoration: none;
+}
+
+.marca__nombre strong {
+  color: var(--primario);
+  font-weight: 700;
 }
 
 .marca__sello {
   display: grid;
-  width: 30px;
+  width: 34px;
   aspect-ratio: 1;
   place-items: center;
-  background: var(--green);
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primario), var(--morado));
   color: white;
-  font-family: "Manrope", sans-serif;
-  font-size: 16px;
-  font-weight: 800;
+  font-family: "General Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .estado {
@@ -104,11 +115,11 @@ a {
 }
 
 .pestana:hover {
-  background: rgba(14, 107, 84, 0.05);
+  background: rgba(219, 39, 113, 0.06);
 }
 
 .pestana--activa {
-  border-bottom-color: var(--green);
+  border-bottom-color: var(--primario);
   background: var(--paper);
 }
 
@@ -124,7 +135,7 @@ a {
 }
 
 .pestana:focus-visible {
-  outline: 3px solid var(--orange);
+  outline: 3px solid var(--acento);
   outline-offset: -3px;
 }
 
@@ -143,7 +154,7 @@ a {
 
 .sobretitulo {
   margin: 0 0 16px;
-  color: var(--green);
+  color: var(--primario);
 }
 
 .introduccion__fila {
@@ -161,7 +172,7 @@ h1 {
 }
 
 h1 span {
-  color: var(--orange);
+  color: var(--acento);
 }
 
 .introduccion__fila > p {
@@ -211,8 +222,8 @@ h1 span {
   aspect-ratio: 1;
   flex: 0 0 auto;
   place-items: center;
-  background: #e7eee8;
-  color: var(--green);
+  background: var(--tinte);
+  color: var(--primario);
 }
 
 .grafica h2 {
@@ -245,7 +256,7 @@ h1 span {
 
 .grafica__imagen-enlace:focus-visible,
 .marca:focus-visible {
-  outline: 3px solid var(--orange);
+  outline: 3px solid var(--acento);
   outline-offset: 3px;
 }
 
@@ -308,12 +319,12 @@ h1 span {
 }
 
 .boton:hover:not(:disabled) {
-  border-color: var(--green);
+  border-color: var(--primario);
 }
 
 .boton--activo {
-  border-color: var(--green);
-  background: var(--green);
+  border-color: var(--primario);
+  background: var(--primario);
   color: #fff;
 }
 
@@ -324,7 +335,7 @@ h1 span {
 
 .boton:focus-visible,
 .tabla:focus-visible {
-  outline: 3px solid var(--orange);
+  outline: 3px solid var(--acento);
   outline-offset: 2px;
 }
 
@@ -354,15 +365,15 @@ h1 span {
 .tabla th {
   position: sticky;
   top: 0;
-  background: #e7eee8;
-  color: var(--green);
+  background: var(--tinte);
+  color: var(--primario);
   font-family: var(--mono);
   font-size: 10px;
   font-weight: 500;
 }
 
 .tabla tbody tr:nth-child(even) {
-  background: #fafbf7;
+  background: #fdf9fb;
 }
 
 .estado-carga {
@@ -374,9 +385,9 @@ h1 span {
 }
 
 .estado-carga--error {
-  border: 1px solid var(--orange);
-  background: #fdf1ec;
-  color: #8a3417;
+  border: 1px solid var(--acento);
+  background: #fff1ec;
+  color: #9a2f0f;
 }
 
 .pie-pagina {
