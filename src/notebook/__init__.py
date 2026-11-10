@@ -1,0 +1,1 @@
+"""Etapas del procesamiento de registros."""

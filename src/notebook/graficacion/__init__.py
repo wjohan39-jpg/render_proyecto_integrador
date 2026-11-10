@@ -1,0 +1,1 @@
+"""Graficas y conclusiones de registros."""

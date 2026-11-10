@@ -1,0 +1,18 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+const frontendDirectory = path.dirname(fileURLToPath(import.meta.url));
+
+export default defineConfig({
+  plugins: [react()],
+  publicDir: path.resolve(frontendDirectory, "../reportes"),
+  server: {
+    host: "127.0.0.1",
+  },
+  build: {
+    outDir: "dist",
+    emptyOutDir: true,
+  },
+});

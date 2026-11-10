@@ -1,0 +1,1 @@
+"""Consultas sobre registros limpios."""

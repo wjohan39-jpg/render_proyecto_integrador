@@ -1,0 +1,47 @@
+id_registro,id_participante,reto,estado,fecha_inscripcion
+R001,P01,Reto Python Básico,Confirmada,2026-06-10
+R002,P02,Reto Python Básico,Confirmada,2026-07-03
+R003,P03,Reto Python Básico,Pendiente,2026-08-05
+R004,P04,Reto Python Básico,Confirmada,2026-08-12
+R005,P06,Reto Python Básico,Confirmada,2026-08-14
+R006,P07,Reto Python Básico,Cancelada,2026-08-20
+R007,P08,Reto Python Básico,Confirmada,2026-09-02
+R008,P09,Reto Python Básico,Confirmada,2026-09-15
+R009,P01,Reto Python Básico,Confirmada,2026-06-10
+R010,P05,Reto SQL,Confirmada,2026-07-08
+R011,P10,Reto SQL,Confirmada,2026-08-01
+R012,P11,Reto SQL,Pendiente,2026-08-09
+R013,P12,Reto SQL,Confirmada,2026-08-18
+R014,P13,Reto SQL,Confirmada,2026-09-05
+R015,P14,Reto SQL,Cancelada,2026-10-01
+R016,P05,Reto SQL,Confirmada,2026-07-08
+R017,P02,Reto Datos con Pandas,Confirmada,2026-07-20
+R018,P15,Reto Datos con Pandas,Confirmada,2026-08-03
+R019,P16,Reto Datos con Pandas,Confirmada,2026-08-22
+R020,P17,Reto Datos con Pandas,Pendiente,2026-09-10
+R021,P18,Reto Datos con Pandas,Confirmada,2026-10-05
+R022,P03,Reto Git y GitHub,Confirmada,2026-06-25
+R023,P19,Reto Git y GitHub,Confirmada,2026-07-14
+R024,P20,Reto Git y GitHub,Pendiente,2026-08-07
+R025,P21,Reto Git y GitHub,Confirmada,2026-08-25
+R026,P22,Reto Git y GitHub,Cancelada,2026-09-20
+R027,P04,Reto API REST,Confirmada,2026-07-30
+R028,P23,Reto API REST,Confirmada,2026-08-11
+R029,P24,Reto API REST,Pendiente,2026-09-03
+R030,P25,Reto API REST,Confirmada,2026-10-12
+R031,P26,Reto HTML y CSS,Confirmada,2026-06-18
+R032,P27,Reto HTML y CSS,Confirmada,2026-07-22
+R033,P28,Reto HTML y CSS,Confirmada,2026-08-16
+R034,P06,Reto HTML y CSS,Pendiente,2026-09-25
+R035,P26,Reto JavaScript,Confirmada,2026-07-27
+R036,P29,Reto JavaScript,Confirmada,2026-08-28
+R037,P30,Reto JavaScript,Confirmada,2026-10-08
+R038,P10,Reto Docker,Confirmada,2026-08-19
+R039,P19,Reto Docker,Pendiente,2026-09-12
+R040,P23,Reto Docker,Confirmada,2026-10-15
+R041,P12,Reto Pruebas Unitarias,Confirmada,2026-09-18
+R042,P24,Reto Pruebas Unitarias,Cancelada,2026-10-20
+R043,P15,Reto Visualización,Confirmada,2026-09-28
+R044,P18,Reto Visualización,Confirmada,2026-10-22
+R045,P20,Reto Linux,Confirmada,2026-10-02
+R046,P30,Reto Seguridad Web,Pendiente,2026-10-25
