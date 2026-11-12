@@ -27,6 +27,14 @@ La API usa el plan gratuito: si pasa ~15 minutos sin recibir visitas se apaga, y
 
 Cada `git push` a `main` vuelve a desplegar ambos servicios automáticamente (la app de Render está instalada en el repositorio de GitHub).
 
+### Base de datos
+
+En Render, la API guarda el CRUD (usuarios, empresas, prioridades, retos y registros) en la base **Render Postgres** `proyecto-integrador-db`. El servicio de la API la recibe en la variable de entorno `DATABASE_URL` (la *Internal Database URL* de la base). La primera vez que la API arranca con una base vacía crea las tablas y carga los CSV de `data/limpio/`; después los cambios se conservan entre despliegues.
+
+En local, sin `DATABASE_URL`, la API usa SQLite (`data/integrador.db`). Para ver la base de Render desde DBeaver o pgAdmin usa la *External Database URL* (Render → base de datos → **Connect** → **External**).
+
+La base gratuita de Render vence a los 30 días de creada.
+
 ## Estructura
 
 ```text

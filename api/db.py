@@ -1,10 +1,15 @@
-"""Base de datos SQLite para el CRUD (empresas, prioridades, retos, registros y usuarios).
+"""Base de datos del CRUD (empresas, prioridades, retos, registros y usuarios).
+
+- Con la variable DATABASE_URL (por ejemplo la Internal Database URL de Render Postgres)
+  se usa PostgreSQL y los datos se conservan entre despliegues.
+- Sin DATABASE_URL (desarrollo local) se usa SQLite en data/integrador.db.
 
 La primera vez que arranca la API se crean las tablas y se cargan los CSV limpios
 de data/limpio/. A partir de ahi los cambios del CRUD viven en la base de datos;
 los CSV y las graficas de main.py no se modifican.
 """
 import os
+import re
 import sqlite3
 import uuid
 from contextlib import contextmanager
@@ -18,6 +23,8 @@ from api.seguridad import cifrar_contrasena
 RAIZ = Path(__file__).resolve().parents[1]
 CARPETA_LIMPIO = RAIZ / "data" / "limpio"
 RUTA_DB = Path(os.getenv("DB_PATH", RAIZ / "data" / "integrador.db"))
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+USA_POSTGRES = DATABASE_URL.startswith(("postgres://", "postgresql://"))
 
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS usuarios (
@@ -89,7 +96,47 @@ def ahora() -> str:
     return datetime.now().isoformat(timespec="seconds")
 
 
-def conectar() -> sqlite3.Connection:
+def traducir_a_postgres(sql: str) -> str:
+    """Convierte el SQL escrito para SQLite al dialecto de PostgreSQL."""
+    ignorar = sql.lstrip().upper().startswith("INSERT OR IGNORE")
+    sql = re.sub(r"INSERT OR IGNORE INTO", "INSERT INTO", sql, flags=re.IGNORECASE)
+    sql = re.sub(r"([\w.]+) COLLATE NOCASE", r"LOWER(\1)", sql)
+    sql = sql.replace("?", "%s")
+    return f"{sql} ON CONFLICT DO NOTHING" if ignorar else sql
+
+
+class ConexionPostgres:
+    """Envuelve psycopg con la misma interfaz de sqlite3 que usa el resto de la API."""
+
+    def __init__(self, con):
+        self._con = con
+
+    def execute(self, sql: str, parametros=()):
+        return self._con.execute(traducir_a_postgres(sql), tuple(parametros) or None)
+
+    def executemany(self, sql: str, filas) -> None:
+        with self._con.cursor() as cursor:
+            cursor.executemany(traducir_a_postgres(sql), list(filas))
+
+    def executescript(self, sql: str) -> None:
+        self._con.execute(sql)
+
+    def commit(self) -> None:
+        self._con.commit()
+
+    def rollback(self) -> None:
+        self._con.rollback()
+
+    def close(self) -> None:
+        self._con.close()
+
+
+def conectar():
+    if USA_POSTGRES:
+        import psycopg
+        from psycopg.rows import dict_row
+
+        return ConexionPostgres(psycopg.connect(DATABASE_URL, row_factory=dict_row))
     con = sqlite3.connect(RUTA_DB)
     con.row_factory = sqlite3.Row
     con.execute("PRAGMA foreign_keys = ON")
@@ -117,13 +164,16 @@ def _cargar_csv(con: sqlite3.Connection, tabla: str) -> None:
     columnas = COLUMNAS_CSV[tabla]
     df = pd.read_csv(ruta, dtype=str, keep_default_na=False)[columnas]
     df = df.apply(lambda s: s.str.strip())
+    enteros = {"empresas": ["activa"], "prioridades": ["nivel", "dias_max_respuesta"]}.get(tabla, [])
     if tabla == "empresas":
-        df["activa"] = (df["activa"].str.lower() == "true").astype(int)
+        df["activa"] = (df["activa"].str.lower() == "true").astype(int).astype(str)
+    # Tuplas con tipos de Python (int/str): psycopg no acepta los enteros de numpy.
+    filas = [
+        tuple(int(v) if c in enteros else v for c, v in zip(columnas, fila))
+        for fila in df.itertuples(index=False, name=None)
+    ]
     marcas = ", ".join("?" for _ in columnas)
-    con.executemany(
-        f"INSERT OR IGNORE INTO {tabla} ({', '.join(columnas)}) VALUES ({marcas})",
-        df.itertuples(index=False, name=None),
-    )
+    con.executemany(f"INSERT OR IGNORE INTO {tabla} ({', '.join(columnas)}) VALUES ({marcas})", filas)
 
 
 def _crear_admin(con: sqlite3.Connection) -> None:
@@ -143,7 +193,7 @@ def inicializar() -> None:
     with conexion() as con:
         con.executescript(ESQUEMA)
         for tabla in COLUMNAS_CSV:
-            if con.execute(f"SELECT COUNT(*) FROM {tabla}").fetchone()[0] == 0:
+            if con.execute(f"SELECT COUNT(*) AS total FROM {tabla}").fetchone()["total"] == 0:
                 _cargar_csv(con, tabla)
-        if con.execute("SELECT COUNT(*) FROM usuarios").fetchone()[0] == 0:
+        if con.execute("SELECT COUNT(*) AS total FROM usuarios").fetchone()["total"] == 0:
             _crear_admin(con)
