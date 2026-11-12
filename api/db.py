@@ -189,7 +189,13 @@ def _crear_admin(con: sqlite3.Connection) -> None:
 
 def inicializar() -> None:
     """Crea las tablas y, si estan vacias, las llena con los CSV limpios."""
-    RUTA_DB.parent.mkdir(parents=True, exist_ok=True)
+    if DATABASE_URL and not USA_POSTGRES:
+        raise RuntimeError("DATABASE_URL debe empezar por postgresql:// (revisa que no tenga comillas ni espacios).")
+    if USA_POSTGRES:
+        print("Base de datos: PostgreSQL (DATABASE_URL)", flush=True)
+    else:
+        print(f"Base de datos: SQLite ({RUTA_DB}). Sin DATABASE_URL los datos no persisten en Render.", flush=True)
+        RUTA_DB.parent.mkdir(parents=True, exist_ok=True)
     with conexion() as con:
         con.executescript(ESQUEMA)
         for tabla in COLUMNAS_CSV:
