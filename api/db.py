@@ -194,7 +194,11 @@ def inicializar() -> None:
     if USA_POSTGRES:
         print("Base de datos: PostgreSQL (DATABASE_URL)", flush=True)
     else:
-        print(f"Base de datos: SQLite ({RUTA_DB}). Sin DATABASE_URL los datos no persisten en Render.", flush=True)
+        motivo = "DATABASE_URL existe pero esta vacia" if "DATABASE_URL" in os.environ else "no hay DATABASE_URL"
+        parecidas = [k for k in os.environ if "DATABASE" in k.upper() and k != "DATABASE_URL"]
+        if parecidas:
+            motivo += f"; variables con nombre parecido: {parecidas}"
+        print(f"Base de datos: SQLite ({RUTA_DB}); {motivo}. Los datos no persisten en Render.", flush=True)
         RUTA_DB.parent.mkdir(parents=True, exist_ok=True)
     with conexion() as con:
         con.executescript(ESQUEMA)
