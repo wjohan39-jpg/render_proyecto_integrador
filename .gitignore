@@ -4,3 +4,5 @@ frontend/dist/
 __pycache__/
 *.py[cod]
 .DS_Store
+# Base de datos SQLite del CRUD (se crea al iniciar la API)
+data/*.db

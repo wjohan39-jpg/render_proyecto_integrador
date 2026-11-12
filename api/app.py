@@ -1,4 +1,7 @@
-"""API REST de solo lectura sobre los resultados de main.py.
+"""API REST del proyecto integrador.
+
+- Reportes (solo lectura): resultados de main.py (CSV limpios, consultas y graficas).
+- Autenticacion y CRUD: empresas, prioridades, retos, registros y usuarios (SQLite, ver api/db.py).
 
 Ejecutar en local (desde la raiz del proyecto):
     uvicorn api.app:app --reload
@@ -7,28 +10,82 @@ Documentacion interactiva: http://127.0.0.1:8000/docs
 """
 import math
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
+from api import auth, crud, db
 from api.catalogo import MODULOS
 
 RAIZ = Path(__file__).resolve().parents[1]
 CARPETA_LIMPIO = RAIZ / "data" / "limpio"
 CARPETA_REPORTES = RAIZ / "reportes"
 
+
+
+@asynccontextmanager
+async def ciclo_de_vida(_: FastAPI):
+    db.inicializar()  # crea las tablas y carga los CSV limpios la primera vez
+    yield
+
+
 app = FastAPI(
     title="API Proyecto integrador",
     description="Prioridades (Dave), registros (Jeferson), empresas (Wesly) y retos (Diego).",
-    version="1.0.0",
+    version="2.0.0",
+    lifespan=ciclo_de_vida,
 )
 
-# Origenes permitidos separados por coma; por defecto cualquiera (la API es de solo lectura).
+# Origenes permitidos separados por coma; por defecto cualquiera.
+# La sesion viaja en la cabecera Authorization (no en cookies), asi que no se usan credenciales CORS.
 origenes = [o.strip() for o in os.getenv("CORS_ORIGINS", "*").split(",") if o.strip()]
-app.add_middleware(CORSMiddleware, allow_origins=origenes, allow_methods=["GET"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origenes,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
+)
+
+MENSAJES_VALIDACION = {
+    "missing": "Este campo es obligatorio.",
+    "string_too_short": "El texto es demasiado corto.",
+    "string_too_long": "El texto es demasiado largo.",
+    "literal_error": "Selecciona una opción válida.",
+    "greater_than_equal": "El valor es demasiado pequeño.",
+    "less_than_equal": "El valor es demasiado grande.",
+    "int_parsing": "Debe ser un número entero.",
+    "date_from_datetime_parsing": "La fecha no es válida.",
+    "date_parsing": "La fecha no es válida.",
+    "datetime_from_date_parsing": "La fecha y hora no son válidas.",
+    "datetime_parsing": "La fecha y hora no son válidas.",
+}
+
+
+@app.exception_handler(RequestValidationError)
+async def errores_de_validacion(_: Request, exc: RequestValidationError):
+    """Responde 422 con un mensaje general y un error en español por campo."""
+    campos: dict[str, str] = {}
+    generales: list[str] = []
+    for error in exc.errors():
+        texto = str(error.get("msg", "")).removeprefix("Value error, ")
+        texto = MENSAJES_VALIDACION.get(error.get("type"), texto)
+        ubicacion = [str(p) for p in error.get("loc", ()) if p != "body"]
+        if ubicacion:
+            campos.setdefault(ubicacion[0], texto)
+        else:
+            generales.append(texto)
+    mensaje = generales[0] if generales else "Revisa los datos marcados en el formulario."
+    return JSONResponse(status_code=422, content={"detail": {"message": mensaje, "fields": campos}})
+
+
+app.include_router(auth.router)
+for router in (crud.empresas, crud.prioridades, crud.retos, crud.registros, crud.usuarios):
+    app.include_router(router)
 
 
 # ----------------------------- utilidades -----------------------------

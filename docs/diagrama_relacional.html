@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagrama relacional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #15151b; --muted: #5a635d; --line: #e6e3e8; --paper: #ffffff; --bg: #faf8fb;
+    --primario: #db2771; --morado: #652d90; --tinte: #fce8f1; --acento: #ff5d31;
+    --pk-bg: #fce8f1; --fk-bg: #efe7f6; --ext: #9a94a0;
+    --mono: "DM Mono", ui-monospace, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #eeeaf2; --muted: #a8a2ae; --line: #3a3540; --paper: #1f1c24; --bg: #16141a;
+      --tinte: #3a1f2c; --pk-bg: #3a1f2c; --fk-bg: #2c2338; --ext: #77707e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.5; }
+  main { max-width: 1240px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .lienzo { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 12px; overflow-x: auto; }
+  svg { display: block; width: 100%; min-width: 760px; height: auto; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 20px; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; }
+  .card h2 { font-size: 1rem; margin: 0 0 10px; }
+  .card ul { margin: 0; padding-left: 18px; }
+  .card li { margin: 4px 0; }
+  code { font-family: var(--mono); font-size: .9em; background: var(--tinte); padding: 1px 5px; border-radius: 4px; }
+  .aviso { border-left: 4px solid var(--acento); }
+  .ley { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .9rem; color: var(--muted); }
+  .chip { display: inline-block; font-family: var(--mono); font-size: .75rem; font-weight: 500; padding: 1px 6px; border-radius: 4px; margin-right: 4px; }
+  .chip.pk { background: var(--pk-bg); color: var(--primario); }
+  .chip.fk { background: var(--fk-bg); color: var(--morado); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Diagrama relacional</h1>
+  <p class="sub">Proyecto Integrador · modelo de datos de los CSV en <code>data/limpio/</code></p>
+
+  <div class="lienzo"><svg id="er" viewBox="0 0 1200 700" role="img" aria-label="Diagrama entidad-relación"></svg></div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Relaciones</h2>
+      <ul>
+        <li><b>empresa</b> 1 — N <b>reto</b>: una empresa propone muchos retos (<code>reto.id_empresa</code>).</li>
+        <li><b>prioridad</b> 1 — N <b>reto</b>: cada reto tiene un nivel de prioridad (<code>reto.id_prioridad</code>).</li>
+        <li><b>categoria</b> 1 — N <b>reto</b>: cada reto pertenece a una categoría (<code>reto.id_categoria</code>).</li>
+        <li><b>reto</b> 1 — N <b>registro</b>: un reto recibe muchas inscripciones (<code>registro.id_reto</code>).</li>
+        <li><b>usuario</b> 1 — N <b>registro</b>: un usuario se inscribe en muchos retos (<code>registro.id_usuario</code>).</li>
+        <li><b>registro</b> resuelve la relación N — M entre <b>usuario</b> y <b>reto</b>; la pareja (<code>id_usuario</code>, <code>id_reto</code>) es única, porque la limpieza elimina los duplicados.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Convenciones</h2>
+      <div class="ley">
+        <span><span class="chip pk">PK</span>clave primaria</span>
+        <span><span class="chip fk">FK</span>clave foránea</span>
+        <span>Borde punteado: tabla que no existe en el proyecto</span>
+        <span>┼ un registro · ○&lt; cero o muchos</span>
+      </div>
+      <p style="margin:12px 0 0;color:var(--muted);font-size:.9rem">
+        Todas las claves son UUID. <code>categoria</code> y <code>usuario</code> solo aparecen como identificadores
+        dentro de <code>reto</code> y <code>registro</code>: no tienen CSV propio (4 categorías y 150 usuarios distintos).
+      </p>
+    </div>
+    <div class="card aviso">
+      <h2>Ojo con los datos actuales</h2>
+      <p style="margin:0">
+        Las claves foráneas de los CSV no coinciden hoy con las tablas padre: 0 de 460 retos apuntan a una empresa
+        o prioridad existente, y 0 de 720 registros apuntan a un reto existente. Cada tabla se simuló por separado,
+        así que el diagrama muestra el modelo previsto, no uniones que funcionen con los datos tal como están.
+        <code>registros_limpio_adjunto.csv</code> usa otro formato (R001, P01…) y queda fuera del modelo.
+      </p>
+    </div>
+  </div>
+</main>
+
+<script>
+const ROW = 26, HEAD = 40;
+const tablas = {
+  empresa: { x: 40, y: 40, w: 270, filas: [
+    ["id", "uuid", "PK"], ["nombre", "texto"], ["nit", "entero"], ["sector", "texto"], ["contacto", "texto"],
+    ["correo", "texto"], ["telefono", "entero"], ["activa", "booleano"], ["correo_valido", "booleano"] ] },
+  categoria: { x: 40, y: 360, w: 270, externa: true, filas: [ ["id", "uuid", "PK"] ] },
+  prioridad: { x: 40, y: 500, w: 270, filas: [
+    ["id", "uuid", "PK"], ["nombre", "texto"], ["nivel", "entero"], ["dias_max_respuesta", "entero"] ] },
+  reto: { x: 450, y: 160, w: 290, filas: [
+    ["id", "uuid", "PK"], ["nombre", "texto"], ["descripcion", "texto"], ["fecha_inicio", "fecha"], ["fecha_fin", "fecha"],
+    ["estado", "texto"], ["id_empresa", "uuid", "FK"], ["id_categoria", "uuid", "FK"], ["id_prioridad", "uuid", "FK"],
+    ["duracion_dias", "entero"], ["fecha_valida", "booleano"] ] },
+  registro: { x: 870, y: 160, w: 290, filas: [
+    ["id", "uuid", "PK"], ["fecha_registro", "fecha y hora"], ["observacion", "texto"], ["estado", "texto"],
+    ["id_usuario", "uuid", "FK"], ["id_reto", "uuid", "FK"], ["mes", "texto"] ] },
+  usuario: { x: 870, y: 560, w: 290, externa: true, filas: [ ["id", "uuid", "PK"] ] },
+};
+
+const svg = document.getElementById("er"), NS = "http://www.w3.org/2000/svg";
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function el(tag, attrs, padre = svg, texto) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (texto != null) e.textContent = texto;
+  padre.appendChild(e); return e;
+}
+const filaY = (t, campo) => { const tb = tablas[t]; return tb.y + HEAD + ROW * tb.filas.findIndex(f => f[0] === campo) + ROW / 2; };
+
+// Conectores (se dibujan primero para quedar debajo de las tablas)
+const lineas = el("g", { fill: "none", "stroke-width": 1.6 });
+function marcaUno(x, y, dir) {             // ┼ : exactamente uno
+  for (const d of [8, 14]) el("line", { x1: x + dir * d, y1: y - 7, x2: x + dir * d, y2: y + 7, stroke: css("--muted") }, lineas);
+}
+function marcaMuchos(x, y, dir) {          // ○< : cero o muchos
+  const b = x + dir * 14;
+  for (const dy of [-8, 0, 8]) el("line", { x1: b, y1: y, x2: x, y2: y + dy, stroke: css("--muted") }, lineas);
+  el("circle", { cx: x + dir * 21, cy: y, r: 5, fill: css("--paper"), stroke: css("--muted") }, lineas);
+}
+function relacion(padre, hijo, campoHijo, ruta) {
+  const py = filaY(padre, "id"), hy = filaY(hijo, campoHijo);
+  const P = tablas[padre], H = tablas[hijo];
+  let d, x0, x1, d0, d1;
+  if (ruta.lado === "derecha") {           // ambos conectan por su borde derecho
+    x0 = P.x + P.w; x1 = H.x + H.w; d0 = 1; d1 = 1;
+    d = `M${x0},${py} H${ruta.x} V${hy} H${x1}`;
+  } else {                                 // padre a la izquierda, hijo a la derecha
+    x0 = P.x + P.w; x1 = H.x; d0 = 1; d1 = -1;
+    d = `M${x0},${py} H${ruta.x} V${hy} H${x1}`;
+  }
+  el("path", { d, stroke: css("--muted") }, lineas);
+  marcaUno(x0, py, d0); marcaMuchos(x1, hy, d1);
+}
+relacion("empresa", "reto", "id_empresa", { x: 410 });
+relacion("categoria", "reto", "id_categoria", { x: 375 });
+relacion("prioridad", "reto", "id_prioridad", { x: 395 });
+relacion("reto", "registro", "id_reto", { x: 805 });
+relacion("usuario", "registro", "id_usuario", { lado: "derecha", x: 1188 });
+
+// Tablas
+for (const [nombre, t] of Object.entries(tablas)) {
+  const g = el("g", {});
+  const alto = HEAD + ROW * t.filas.length;
+  el("rect", { x: t.x, y: t.y, width: t.w, height: alto, rx: 10, fill: css("--paper"),
+    stroke: t.externa ? css("--ext") : css("--line"), "stroke-width": 1.5, "stroke-dasharray": t.externa ? "6 4" : "none" }, g);
+  el("path", { d: `M${t.x},${t.y + HEAD} V${t.y + 10} a10,10 0 0 1 10,-10 H${t.x + t.w - 10} a10,10 0 0 1 10,10 V${t.y + HEAD} Z`,
+    fill: t.externa ? css("--ext") : css("--primario") }, g);
+  el("text", { x: t.x + 14, y: t.y + 26, fill: "#fff", "font-family": "var(--sans)", "font-weight": 700, "font-size": 15 }, g, nombre);
+  el("text", { x: t.x + t.w - 14, y: t.y + 26, fill: "#fff", "text-anchor": "end", "font-family": "var(--mono)", "font-size": 11, opacity: .85 }, g,
+    t.externa ? "sin CSV" : `${nombre === "registro" ? "registros" : nombre === "reto" ? "retos" : nombre === "prioridad" ? "prioridades" : "empresas"}_limpio.csv`);
+  t.filas.forEach(([campo, tipo, clave], i) => {
+    const y = t.y + HEAD + ROW * i;
+    if (i > 0) el("line", { x1: t.x, y1: y, x2: t.x + t.w, y2: y, stroke: css("--line") }, g);
+    if (clave) el("rect", { x: t.x + 1, y: y + (i === 0 ? 0 : 0.5), width: t.w - 2, height: ROW - 1,
+      fill: clave === "PK" ? css("--pk-bg") : css("--fk-bg"), rx: i === t.filas.length - 1 ? 8 : 0 }, g);
+    if (clave) el("text", { x: t.x + 12, y: y + 17, "font-family": "var(--mono)", "font-size": 10, "font-weight": 500,
+      fill: clave === "PK" ? css("--primario") : css("--morado") }, g, clave);
+    el("text", { x: t.x + 40, y: y + 17, "font-family": "var(--mono)", "font-size": 13, fill: css("--ink"),
+      "font-weight": clave ? 500 : 400 }, g, campo);
+    el("text", { x: t.x + t.w - 12, y: y + 17, "text-anchor": "end", "font-family": "var(--sans)", "font-size": 11.5, fill: css("--muted") }, g, tipo);
+  });
+}
+</script>
+</body>
+</html>
