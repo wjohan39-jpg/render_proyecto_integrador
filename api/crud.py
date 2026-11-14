@@ -23,6 +23,16 @@ def _no_existe(recurso: str) -> HTTPException:
     return HTTPException(status.HTTP_404_NOT_FOUND, f"No se encontró el elemento en {recurso}.")
 
 
+_NOMBRES_RELACION = {"id_empresa": "La empresa", "id_categoria": "La categoría", "id_prioridad": "La prioridad",
+                     "id_usuario": "El usuario", "id_reto": "El reto"}
+
+
+def _referencia_invalida(error: db.ErrorReferencia) -> HTTPException:
+    """Con MySQL las claves foraneas exigen que el id elegido exista en su tabla."""
+    texto = f"{_NOMBRES_RELACION.get(error.columna, error.columna)} indicada no existe."
+    return HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, {"message": texto, "fields": {error.columna: texto}})
+
+
 def crear_router(
     recurso: str,
     modelo: type[BaseModel],
@@ -55,19 +65,25 @@ def crear_router(
         valores = {"id": db.nuevo_id(), **preparar(datos.model_dump(mode="json"))}
         columnas = ", ".join(valores)
         marcas = ", ".join("?" for _ in valores)
-        with db.conexion() as con:
-            con.execute(f"INSERT INTO {recurso} ({columnas}) VALUES ({marcas})", tuple(valores.values()))
-            return leer(con, valores["id"])
+        try:
+            with db.conexion() as con:
+                con.execute(f"INSERT INTO {recurso} ({columnas}) VALUES ({marcas})", tuple(valores.values()))
+                return leer(con, valores["id"])
+        except db.ErrorReferencia as error:
+            raise _referencia_invalida(error) from error
 
     @router.put("/{id_}")
     def modificar(id_: str, datos: modelo):  # type: ignore[valid-type]
         valores = preparar(datos.model_dump(mode="json"))
         asignaciones = ", ".join(f"{c} = ?" for c in valores)
-        with db.conexion() as con:
-            cursor = con.execute(f"UPDATE {recurso} SET {asignaciones} WHERE id = ?", (*valores.values(), id_))
-            if cursor.rowcount == 0:
-                raise _no_existe(recurso)
-            return leer(con, id_)
+        try:
+            with db.conexion() as con:
+                cursor = con.execute(f"UPDATE {recurso} SET {asignaciones} WHERE id = ?", (*valores.values(), id_))
+                if cursor.rowcount == 0:
+                    raise _no_existe(recurso)
+                return leer(con, id_)
+        except db.ErrorReferencia as error:
+            raise _referencia_invalida(error) from error
 
     @router.delete("/{id_}", status_code=status.HTTP_204_NO_CONTENT)
     def eliminar(id_: str):

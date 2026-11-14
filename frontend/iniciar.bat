@@ -37,6 +37,13 @@ if not exist "node_modules\vite\package.json" (
   )
 )
 
+REM La web necesita la API (puerto 8000). Si no esta encendida, se abre en otra ventana.
+powershell -NoProfile -Command "if (-not (Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue)) { exit 1 }"
+if errorlevel 1 (
+  echo Iniciando la API con el MySQL de XAMPP en otra ventana...
+  start "API Proyecto Integrador" cmd /k "cd /d "%~dp0.." && python -m uvicorn api.app:app --reload"
+)
+
 echo.
 echo Iniciando Proyecto Integrador Cesde en el navegador...
 echo Para detener el servidor presiona Ctrl+C.

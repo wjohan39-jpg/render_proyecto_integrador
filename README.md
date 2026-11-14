@@ -103,6 +103,11 @@ uvicorn api.app:app --reload
 - API: http://127.0.0.1:8000
 - Documentación interactiva: http://127.0.0.1:8000/docs
 
+En local la API guarda siempre en el MySQL de XAMPP (base `integrador_relacional`, visible en
+phpMyAdmin): enciende MySQL en XAMPP antes de arrancarla. Si la base no existe, la API la crea
+y la llena con los CSV limpios. Otra base se indica con `MYSQL_URL`. En Render se usa
+`DATABASE_URL` (Postgres). `frontend\iniciar.bat` abre también la API si no está encendida.
+
 ### 3. Visor web
 
 En otra terminal:
